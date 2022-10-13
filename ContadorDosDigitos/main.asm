@@ -129,7 +129,7 @@ segundear:
 	mov r16,r28
 	mov r19,r27
 		call maindos
-		call frame
+		call frame	
 		call maintre
 		call frame
 		dec r25
@@ -138,12 +138,12 @@ segundear:
 	
 
 maindos:
-	ldi r17,0b00010000
-	call sacanum
+	ldi r17,0b00010000 ; r17 marca que se va a encender el cuarto número del display, 0001****
+	call sacanum ; sacanum va a usar esa posición y va a encender el número que le pasamos antes a r16
 	ret
 
 maintre:
-	ldi r17,0b00100000
+	ldi r17,0b00100000 ; r17 marca que se va a encender el tercer número del display, 0010****
 	call sacanum2
 	ret
 
@@ -154,7 +154,7 @@ maintre:
 
 sacanum: 
 	call	dato_serie
-	mov		r16, r17
+	mov		r16, r17 ; copia r16 a r17, luego llama a datoserie que envía la copia en r17 en forma de serie al display
 	call	dato_serie
 	sbi		PORTD, 4		;PD.4 a 1, es LCH el reloj del latch
 	cbi		PORTD, 4		;PD.4 a 0, 
@@ -164,21 +164,21 @@ sacanum:
 dato_serie:
 	ldi		r18, 0x08 ; lo utilizo para contar 8 (8 bits)
 
-loop_dato1:
-	cbi		PORTD, 7		;SCLK = 0 reloj en 0
-	lsr		r16				;roto a la derecha r16 y el bit 0 se pone en el C
-	brcs	loop_dato2		;salta si C=1
-	cbi		PORTB, 0		;SD = 0 escribo un 0 
-	rjmp	loop_dato3
+	loop_dato1:
+		cbi		PORTD, 7		;SCLK = 0 reloj en 0
+		lsr		r16				;roto a la derecha r16 y el bit 0 se pone en el C
+		brcs	loop_dato2		;salta si C=1
+		cbi		PORTB, 0		;SD = 0 escribo un 0 
+		rjmp	loop_dato3
 
-loop_dato2:
-	sbi		PORTB, 0		;SD = 1 escribo un 1
+	loop_dato2:
+		sbi		PORTB, 0		;SD = 1 escribo un 1
 
-loop_dato3:
-	sbi		PORTD, 7		;SCLK = 1 reloj en 1
-	dec		r18
-	brne	loop_dato1; cuando r17 llega a 0 corta y vuelve
-	ret
+	loop_dato3:
+		sbi		PORTD, 7		;SCLK = 1 reloj en 1
+		dec		r18
+		brne	loop_dato1; cuando r17 llega a 0 corta y vuelve
+		ret
   
 
 ; --------------------------------------------------------------
